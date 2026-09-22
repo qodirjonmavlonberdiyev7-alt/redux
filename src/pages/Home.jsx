@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { Circles } from "react-loader-spinner";
-import ProductTile from "../components/ProductTile";
+import React, { useEffect, useState } from 'react';
+import ProductTile from '../components/ProductTile';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   async function fetchListOfProducts() {
-    const res = await fetch("https://fakestoreapi.com/products");
-    const data = await res.json();
-    if (data) {
-      setProducts(data);
+    try {
+      setLoading(true);
+      const res = await fetch('https://fakestoreapi.com/products');
+      const data = await res.json();
+      if (data) setProducts(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
       setLoading(false);
     }
   }
@@ -18,20 +21,36 @@ const Home = () => {
   useEffect(() => {
     fetchListOfProducts();
   }, []);
+
   return (
-    <div>
+    <main className="max-w-[1280px] mx-auto px-4 py-6">
+      <div className="flex items-center gap-2 mb-5">
+        <h1 className="text-2xl font-black text-gray-900">Mashhur mahsulotlar</h1>
+        <span className="text-2xl text-gray-300 font-light">&gt;</span>
+      </div>
+
       {loading ? (
-        <div className="min-h-screen w-full flex justify-center items-center">
-          <Circles height={"120"} width={"120"} color="red" visible={true} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+              <div className="aspect-square bg-gray-100" />
+              <div className="p-3 space-y-2">
+                <div className="h-3 bg-gray-100 rounded w-full" />
+                <div className="h-3 bg-gray-100 rounded w-2/3" />
+                <div className="h-4 bg-gray-100 rounded w-1/2 mt-2" />
+                <div className="h-8 bg-gray-100 rounded-xl w-full mt-3" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
-        <div className="min-h-[80vh] grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-6xl mx-auto p-3">
-          {products && products.length
-            ? products.map((pi) => <ProductTile key={pi.id} product={pi} />)
-            : null}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          {products?.map((product) => (
+            <ProductTile key={product.id} product={product} />
+          ))}
         </div>
       )}
-    </div>
+    </main>
   );
 };
 
